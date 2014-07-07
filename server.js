@@ -12,7 +12,7 @@ var credentials = require('./credentials.json');
 //Set up variables needed to access Brandwatch
 var authKey = credentials.authKey;
 var baseUrl = 'https://newapi.brandwatch.com/';
-var queryUrl = '/projects/935709583/queries';
+var queryUrl = '/projects/1998153770/queries';
 
 //Google Oauth Credentials
 var clientId = credentials.clientId;
@@ -30,12 +30,13 @@ function filterQueries(response){
     });
 }
 
-function addCardToClient(tokens){
-    oAuth2Client.credentials = tokens;
+function addCardToClient(queryName) {
+    var cardContent = queryName || 'authenticated';
+
     apiclient.mirror.timeline.insert({
         'html': '<article>' +
                 '<section>' +
-                'Hello Brandwatch' +
+                cardContent +
                 '</section>' +
                 '</article>',
         'menuItems': [
@@ -48,12 +49,17 @@ function addCardToClient(tokens){
     });
 }
 
+function assignTokens(tokens){
+    oAuth2Client.credentials = tokens;
+    addCardToClient();    
+}
+
 function createQueryForBrandwatch(query) {
     // Create a new query in Brandwatch
     request.post(baseUrl + queryUrl + authKey, 
         { json: {
             type:'search string',
-            includedTerms:[query],
+            includedTerms:['("' + query + '" NEAR/10 review*)'],
             languages:['en'],
             name: query + ' #throughglass',
             industry:'general-(recommended)',
@@ -62,6 +68,7 @@ function createQueryForBrandwatch(query) {
         function (error, response, body) {
             // if (!error && response.statusCode == 200) {
                 console.log(body);
+                addCardToClient(body.name);
             // }
         }
     );
@@ -73,83 +80,63 @@ googleapis.discover('mirror', 'v1').execute(function(err, client){
 
 //Create new node server
 http.createServer(function(req, res) {
-    
-    
-
     // Get all queries
-    // request.get(baseUrl + queryUrl + authKey, 
-    //     function(error, response, body){
-    //         filterQueries(JSON.parse(body).results);
-    //     }
-    // );
+    request.get(baseUrl + queryUrl + authKey, 
+        function(error, response, body){
+            filterQueries(JSON.parse(body).results);
+        }
+    );
 
-    // res.writeHead(200, {'Content-Type': 'text/plain'});
-    // res.write('Hello World');
-    // res.end();
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write('Hello World');
+    res.end();
 
     //Authenticate Glass with Google
-    // var u = url.parse(req.url, true);
-    // var s = u.pathname.split('/');
-    // var page = s[s.length - 1];
+    var u = url.parse(req.url, true);
+    var s = u.pathname.split('/');
+    var page = s[s.length - 1];
 
-    // switch(page){
-    //     case 'oauth2callback':
-    //         oAuth2Client.getToken(u.query.code, function(err,tokens) {
-    //             if (err) {
-    //                 res.end('Oops something went wrong');
-    //                 return;
-    //             }
-    //             client_tokens.push(tokens);
-    //             addCardToClient(tokens);
-    //             res.end('Successfully communicated with Google Glass API!');
-    //         });
-    //         break;
-    //     case 'authorize':
-    //         var uri = oAuth2Client.generateAuthUrl({
-    //             access_type: 'offline',
-    //             scope: 'https://www.googleapis.com/auth/glass.timeline',
-    //             approval_prompt: 'force'
-    //         });
-    //         res.writeHead(302, { 'Location': uri });
-    //         res.end();
-    //         break;
-    //     default:
-    //         res.end('Hello! Go to /authorize to connect to Glass.');
-    // }
-
-    switch(req.url) {
-    case '/':
-        if (req.method === 'POST') {
-            var body = '';
-            
-            req.on('data', function (data) {
-                body += data;
+    switch(page) {
+        case 'oauth2callback':
+            oAuth2Client.getToken(u.query.code, function(err,tokens) {
+                if (err) {
+                    res.end('Oops something went wrong');
+                    return;
+                }
+                client_tokens.push(tokens);
+                assignTokens(tokens);
+                res.end('Successfully communicated with Google Glass API!');
             });
-
-            req.on('end', function () {
-                var result = qs.parse(body);
-
-                createQueryForBrandwatch(result.query);
-
-                res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
-                res.end();
+            break;
+        case 'authorize':
+            var uri = oAuth2Client.generateAuthUrl({
+                access_type: 'offline',
+                scope: 'https://www.googleapis.com/auth/glass.timeline',
+                approval_prompt: 'force'
             });
+            res.writeHead(302, { 'Location': uri });
+            res.end();
+            break;
+        case 'query':
+            if (req.method === 'POST') {
+                var body = '';
+                
+                req.on('data', function (data) {
+                    body += data;
+                });
+
+                req.on('end', function () {
+                    var result = qs.parse(body);
+                    
+                    createQueryForBrandwatch(result.query, req, res);
+
+                    res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
+                    res.end();
+                });
+            }
+            break;
+        default:
+            res.end('Hello! Go to /authorize to connect to Glass.');
+            console.log('[404] ' + req.method + ' to ' + req.url);
         }
-        break;
-    default:
-        res.writeHead(404, 'Not found', {'Content-Type': 'text/html'});
-        res.end('<html><head><title>404 - Not found</title></head><body><h1>Not found.</h1></body></html>');
-        console.log('[404] ' + req.method + ' to ' + req.url);
-    }
-
 }).listen(8080);
-
-// var net = require('net');
-
-// var server = net.createServer(function (socket) {
-//   socket.write('Echo server\r\n');
-//   socket.pipe(socket);
-//   console.log(socket);
-// });
-
-// server.listen(8080, '127.0.0.1');
