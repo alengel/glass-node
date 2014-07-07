@@ -2,17 +2,12 @@
 
 //Require in node modules 
 var http = require('http');
-var request = require('request');
+// var request = require('request');
 var url = require('url');
-var fs = require('fs');
 var googleapis = require('googleapis');
 var qs = require('querystring');
 var credentials = require('./credentials.json');
-
-//Set up variables needed to access Brandwatch
-var authKey = credentials.authKey;
-var baseUrl = 'https://newapi.brandwatch.com/';
-var queryUrl = '/projects/1998153770/queries';
+var brandwatch = require('./js/brandwatch.js');
 
 //Google Oauth Credentials
 var clientId = credentials.clientId;
@@ -23,12 +18,6 @@ var oAuth2Client = new googleapis.OAuth2Client(clientId, clientSecret, redirectU
 
 var apiclient = null;
 var client_tokens = [];
-
-function filterQueries(response){
-    response.forEach(function(query){
-        console.log(query.name);
-    });
-}
 
 function addCardToClient(queryName) {
     var cardContent = queryName || 'authenticated';
@@ -54,42 +43,12 @@ function assignTokens(tokens){
     addCardToClient();    
 }
 
-function createQueryForBrandwatch(query) {
-    // Create a new query in Brandwatch
-    request.post(baseUrl + queryUrl + authKey, 
-        { json: {
-            type:'search string',
-            includedTerms:['("' + query + '" NEAR/10 review*)'],
-            languages:['en'],
-            name: query + ' #throughglass',
-            industry:'general-(recommended)',
-            description:'Query created using Brandwatch Glassware'
-        }},
-        function (error, response, body) {
-            // if (!error && response.statusCode == 200) {
-                console.log(body);
-                addCardToClient(body.name);
-            // }
-        }
-    );
-}
-
 googleapis.discover('mirror', 'v1').execute(function(err, client){
     apiclient = client;
 });
 
 //Create new node server
 http.createServer(function(req, res) {
-    // Get all queries
-    request.get(baseUrl + queryUrl + authKey, 
-        function(error, response, body){
-            filterQueries(JSON.parse(body).results);
-        }
-    );
-
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.write('Hello World');
-    res.end();
 
     //Authenticate Glass with Google
     var u = url.parse(req.url, true);
@@ -128,7 +87,8 @@ http.createServer(function(req, res) {
                 req.on('end', function () {
                     var result = qs.parse(body);
                     
-                    createQueryForBrandwatch(result.query, req, res);
+                    // brandwatch.getAllQueries();
+                    brandwatch.createQuery(result.query);
 
                     res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
                     res.end();
