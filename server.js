@@ -19,13 +19,12 @@ var oAuth2Client = new googleapis.OAuth2Client(clientId, clientSecret, redirectU
 var apiclient = null;
 var client_tokens = [];
 
-function addCardToClient(queryName) {
-    var cardContent = queryName || 'authenticated';
-
+//Temporary to check oAuth works
+function addCardToClient(){
     apiclient.mirror.timeline.insert({
         'html': '<article>' +
                 '<section>' +
-                cardContent +
+                'authenticated' +
                 '</section>' +
                 '</article>',
         'menuItems': [
@@ -40,7 +39,9 @@ function addCardToClient(queryName) {
 
 function assignTokens(tokens){
     oAuth2Client.credentials = tokens;
-    addCardToClient();    
+    
+    //TODO: temporary - remove later
+    brandwatch.getAllQueries(apiclient, oAuth2Client, 'San Francisco');    
 }
 
 googleapis.discover('mirror', 'v1').execute(function(err, client){
@@ -64,6 +65,7 @@ http.createServer(function(req, res) {
                 }
                 client_tokens.push(tokens);
                 assignTokens(tokens);
+
                 res.end('Successfully communicated with Google Glass API!');
             });
             break;
@@ -77,6 +79,7 @@ http.createServer(function(req, res) {
             res.end();
             break;
         case 'query':
+        console.log('made it here');
             if (req.method === 'POST') {
                 var body = '';
                 
@@ -87,8 +90,8 @@ http.createServer(function(req, res) {
                 req.on('end', function () {
                     var result = qs.parse(body);
                     
-                    // brandwatch.getAllQueries();
-                    brandwatch.createQuery(result.query);
+                    // brandwatch.getAllQueries(apiclient, oAuth2Client, result.query);
+                    // brandwatch.createQuery(apiclient, oAuth2Client, result.query);
 
                     res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
                     res.end();
