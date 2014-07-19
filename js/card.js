@@ -1,5 +1,7 @@
 'use strict';
 
+var sentimentCard = require('./cards/sentimentCard.js');
+
 function addCardToClient(apiclient, oAuth2Client, template) {
         //Insert the card into the timeline
         apiclient.mirror.timeline
@@ -94,31 +96,7 @@ var Card = {
 
     //Build the HTML for the Sentiment card
     buildSentimentCard: function(apiclient, oAuth2Client, sentiments) {
-        var template = {
-            'html': '<article>' +
-                      '<section>' +
-                        '<table class="align-justify">' + 
-                          '<tbody>' +
-                            '<tr>' +
-                              '<td>Volume</td>' +
-                              '<td>'+ sentiments.volume +'</td>' +
-                            '</tr>' +
-                            '<tr>' +
-                              '<td>Positive</td>' +
-                              '<td class="green">'+ sentiments.positive +'</td>' +
-                            '</tr>' +
-                            '<tr>' +
-                              '<td>Negative</td>' +
-                              '<td class="red">'+ sentiments.negative +'</td>' +
-                           '</tr>' +
-                          '</tbody>' +
-                        '</table>' +
-                    '</section>' +
-                    '<footer>' +
-                        '<p>' + sentiments.query + '</p>' +
-                    '</footer>' +
-                    '</article>'
-            };
+        var template = sentimentCard.buildTemplate(sentiments);
 
         //Push the card to Glass
         addCardToClient(apiclient, oAuth2Client, template);
