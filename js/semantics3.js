@@ -1,6 +1,7 @@
 'use strict';
 
 var credentials = require('../credentials.json');
+var card = require('./card.js');
 var sem3 = require('semantics3-node')(credentials.semantics3Key, credentials.semantics3Secret);
 
 // var card = require('./card.js');
@@ -15,15 +16,18 @@ var Semantics3 = {
             return;
         }
 
-        sem3.products.products_field('search', query );
+        sem3.products.products_field('search', query);
         sem3.products.get_products(
-           function(err, products) {
-              if (err) {
-                 console.log('Couldn\'t execute query: get_products');
-                 return;
-              }   
-            console.log('Results of query:\n' + JSON.stringify( products )); 
-           }   
+            function(err, body) {
+                if (err) {
+                    console.log('Couldn\'t execute query: get_products');
+                    return;
+                }   
+                
+                var features = JSON.parse(body).results[0].features;
+
+                card.buildFeatureCard(apiclient, oAuth2Client, features, query);
+            }   
         );
     }
 };

@@ -2,6 +2,7 @@
 
 var sentimentCard = require('./cards/sentimentCard.js');
 var topicsCard = require('./cards/topicsCard.js');
+var featureCard = require('./cards/featureCard.js');
 
 function addCardToClient(apiclient, oAuth2Client, template) {
         //Insert the card into the timeline
@@ -47,6 +48,12 @@ var Card = {
         var template = topicsCard.buildTemplate(topics);
 
         //Push the card to Glass
+        addCardToClient(apiclient, oAuth2Client, template);
+    },
+
+    buildFeatureCard: function(apiclient, oAuth2Client, features, query) {
+        var template = featureCard.buildTemplate(features, query);
+
         addCardToClient(apiclient, oAuth2Client, template);
     }
 };
