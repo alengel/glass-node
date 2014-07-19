@@ -68,7 +68,7 @@ var Brandwatch = {
 
                 console.log(matchedQuery.name);
                 
-                Brandwatch.getSentiment(apiclient, oAuth2Client, matchedQuery);
+                Brandwatch.getTopics(apiclient, oAuth2Client, matchedQuery);
                 // card.addCardToClient(apiclient, oAuth2Client, matchedQuery.name);
             }
         );
