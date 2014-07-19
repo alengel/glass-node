@@ -2,12 +2,12 @@
 
 //Require in node modules 
 var http = require('http');
-// var request = require('request');
 var url = require('url');
 var googleapis = require('googleapis');
 var qs = require('querystring');
 var credentials = require('./credentials.json');
 var brandwatch = require('./js/brandwatch.js');
+var semantics3 = require('./js/semantics3.js');
 
 //Google Oauth Credentials
 var clientId = credentials.clientId;
@@ -41,7 +41,9 @@ function assignTokens(tokens){
     oAuth2Client.credentials = tokens;
     
     //TODO: temporary - remove later
-    brandwatch.getAllQueries(apiclient, oAuth2Client, 'San Francisco');    
+    var query = 'iPhone 4';
+    // brandwatch.getAllQueries(apiclient, oAuth2Client, query);  
+    semantics3.createQuery(apiclient, oAuth2Client, query);
 }
 
 googleapis.discover('mirror', 'v1').execute(function(err, client){
