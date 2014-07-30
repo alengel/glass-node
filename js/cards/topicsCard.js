@@ -75,7 +75,7 @@ var TopicsCard = {
                         '</table>' +
                       '</section>' +
                       '<footer>' +
-                        '<p>' + topics[0].queries[0].name + '</p>' +
+                        '<p>' + topics[0].queries[0].name + ' Topics</p>' +
                     '</footer>' +
                     '</article>'
             };

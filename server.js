@@ -22,15 +22,22 @@ var client_tokens = [];
 //Temporary to check oAuth works
 function addCardToClient(){
     apiclient.mirror.timeline.insert({
+        'bundleId': 'customBundle',
         'html': '<article>' +
                 '<section>' +
-                'authenticated' +
+                'Item could not be identified. Please try again later.' +
                 '</section>' +
+                '<footer>' +
+                    '<p>Brandwatch Glassware</p>' +
+                '</footer>' +
                 '</article>',
         'menuItems': [
             {'action': 'TOGGLE_PINNED'},
             {'action': 'DELETE'}
-        ]
+        ],
+        'notification': {
+            'level': 'DEFAULT'
+        }
     }).withAuthClient(oAuth2Client).execute(function(err, data){
         console.log(err);
         console.log(data);
@@ -39,11 +46,12 @@ function addCardToClient(){
 
 function assignTokens(tokens){
     oAuth2Client.credentials = tokens;
+    // addCardToClient();
     
     //TODO: temporary - remove later
-    var query = 'iPhone 4';
+    // var query = 'iPhone 4';
     // brandwatch.getAllQueries(apiclient, oAuth2Client, query);  
-    semantics3.createQuery(apiclient, oAuth2Client, query);
+    // semantics3.createQuery(apiclient, oAuth2Client, query);
 }
 
 googleapis.discover('mirror', 'v1').execute(function(err, client){
@@ -92,7 +100,7 @@ http.createServer(function(req, res) {
                 req.on('end', function () {
                     var result = qs.parse(body);
                     
-                    // brandwatch.getAllQueries(apiclient, oAuth2Client, result.query);
+                    brandwatch.getAllQueries(apiclient, oAuth2Client, result.query);
                     // brandwatch.createQuery(apiclient, oAuth2Client, result.query);
 
                     res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
