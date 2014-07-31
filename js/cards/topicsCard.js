@@ -66,6 +66,7 @@ var TopicsCard = {
     //Build the HTML for the Topics card
     buildTemplate: function(topics) {
         return {
+            'bundleId': 'brandwatch_' + topics[0].queries[0].name,
             'html': '<article>' +
                       '<section>' +
                         '<table>' + 
@@ -77,8 +78,12 @@ var TopicsCard = {
                       '<footer>' +
                         '<p>' + topics[0].queries[0].name + ' Topics</p>' +
                     '</footer>' +
-                    '</article>'
-            };
+                    '</article>',
+            'menuItems': [
+                {'action': 'TOGGLE_PINNED'},
+                {'action': 'DELETE'}
+            ]
+        };
     }
 };
 

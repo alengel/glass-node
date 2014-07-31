@@ -17,17 +17,22 @@ var FeatureCard = {
     //Build the HTML for the Features card
     buildTemplate: function(features, query) {
         return {
+            'bundleId': 'brandwatch_' + query,
             'html': '<article>' +
                         '<section>' +
-                        '<ul class="text-x-small">' +
+                        '<ul class="text-auto-size">' +
                             buildRows(features) + 
                         '</ul>' +
                         '</section>' +
                         '<footer>' +
                             '<p>' + query + ' Features</p>' +
                         '</footer>' +
-                    '</article>'
-            };
+                    '</article>',
+            'menuItems': [
+                {'action': 'TOGGLE_PINNED'},
+                {'action': 'DELETE'}
+            ]
+        };
     }
 };
 

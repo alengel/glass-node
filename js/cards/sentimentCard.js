@@ -4,6 +4,7 @@ var SentimentCard = {
     //Build the HTML for the Sentiment card
     buildTemplate: function(sentiments) {
         return {
+            'bundleId': 'brandwatch_' + sentiments.query,
             'html': '<article>' +
                       '<section>' +
                         '<table class="align-justify">' + 
@@ -26,8 +27,12 @@ var SentimentCard = {
                     '<footer>' +
                         '<p>' + sentiments.query + '</p>' +
                     '</footer>' +
-                    '</article>'
-            };
+                    '</article>',
+            'menuItems': [
+                {'action': 'TOGGLE_PINNED'},
+                {'action': 'DELETE'}
+            ]    
+        };
     }
 };
 
