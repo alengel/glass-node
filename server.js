@@ -65,7 +65,6 @@ http.createServer(function(req, res) {
 
                 req.on('end', function () {
                     var result = qs.parse(body);
-                    console.log('what is this ' + result.query);
                     
                     brandwatch.getSearchQuery(apiclient, oAuth2Client, result.query);
                     // brandwatch.createQuery(apiclient, oAuth2Client, result.query);

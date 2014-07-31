@@ -2,6 +2,7 @@
 
 var request = require('request');
 var _ =  require('underscore');
+var moment = require('moment');
 
 var credentials = require('../credentials.json');
 var card = require('./card.js');
@@ -10,7 +11,9 @@ var semantics3 = require('./semantics3.js');
 //Set up variables needed to access Brandwatch
 var authKey = credentials.authKey;
 var baseUrl = 'https://newapi.brandwatch.com/projects/' + credentials.projectId;
-var filters = '?endDate=2014-07-18&startDate=2014-07-11&pageType=review&queryId=';
+var today = moment().format('YYYY-MM-DD');
+var week = moment().subtract('7', 'days').format('YYYY-MM-DD');
+var filters = '?endDate='+ today +'&startDate='+ week +'&pageType=review&queryId=';
 
 
 function filterQueries(requestedQuery, response){
@@ -69,6 +72,7 @@ var Brandwatch = {
         );
     },
 
+    //get sentiment data from Brandwatch
     getSentiment: function(apiclient, oAuth2Client, matchedQuery) {
         var url = '/data/volume/months/sentiment' + filters + matchedQuery.id + '&';
         
