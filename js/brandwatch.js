@@ -76,6 +76,8 @@ var Brandwatch = {
     getSentiment: function(apiclient, oAuth2Client, matchedQuery) {
         var url = '/data/volume/months/sentiment' + filters + matchedQuery.id + '&';
         
+        console.log('requesting sentiment data' + moment().format('HH-mm-ss-SSS'));
+        
         request.get(baseUrl + url + authKey,
             function (error, response, body) {
                 var results = JSON.parse(body).results[0].values,
@@ -96,6 +98,8 @@ var Brandwatch = {
                 sentiments.query = matchedQuery.name;
                 sentiments.volume = volume;
 
+                console.log('received sentiment data' + moment().format('HH-mm-ss-SSS'));
+
                 card.buildSentimentCard(apiclient, oAuth2Client, sentiments);
             }
         );
@@ -104,12 +108,16 @@ var Brandwatch = {
     getTopics: function(apiclient, oAuth2Client, matchedQuery) {
         var url = '/data/volume/topics/queries' + filters + matchedQuery.id + '&';
 
+        console.log('requesting topics data' + moment().format('HH-mm-ss-SSS'));
+
         request.get(baseUrl + url + authKey,
             function (error, response, body) {
                 var results = JSON.parse(body).topics,
                     sortedResults = _.sortBy(results, function(topic){
                         return topic.volume;
                     });
+
+                console.log('received topics data' + moment().format('HH-mm-ss-SSS'));
 
                 card.buildTopicsCard(apiclient, oAuth2Client, sortedResults);
             }

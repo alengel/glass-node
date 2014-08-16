@@ -56,6 +56,8 @@ http.createServer(function(req, res) {
             break;
         //Route accessed by Glass
         case 'query':
+            console.log('received query from Glass');
+            
             if (req.method === 'POST') {
                 var body = '';
                 
