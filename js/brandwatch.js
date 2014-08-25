@@ -6,7 +6,6 @@ var moment = require('moment');
 
 var credentials = require('../credentials.json');
 var card = require('./card.js');
-var semantics3 = require('./semantics3.js');
 
 //Set up variables needed to access Brandwatch
 var authKey = credentials.authKey;
@@ -15,6 +14,7 @@ var today = moment().format('YYYY-MM-DD');
 var week = moment().subtract('7', 'days').format('YYYY-MM-DD');
 var filters = '?endDate='+ today +'&startDate='+ week +'&pageType=review&queryId=';
 
+var TAG = 'brandwatch';
 
 function filterQueries(requestedQuery, response){
     var returnedQuery;
@@ -61,12 +61,16 @@ var Brandwatch = {
         var url = '/queries/?',
             matchedQuery;
 
+        console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG, 'Measurement ' + 'Requesting queryId for query' + query);
+
         request.get(baseUrl + url + authKey + '&nameContains=' + query.split(' ').join('+'), 
             function (error, response, body) {
+                
+                console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG, 'Measurement ' + 'Received queryId');
+                
                 matchedQuery = filterQueries(query, JSON.parse(body).results);
                 
                 Brandwatch.getSentiment(apiclient, oAuth2Client, matchedQuery);
-                semantics3.getQuery(apiclient, oAuth2Client, matchedQuery.name);
                 Brandwatch.getTopics(apiclient, oAuth2Client, matchedQuery);
             }
         );
@@ -76,10 +80,14 @@ var Brandwatch = {
     getSentiment: function(apiclient, oAuth2Client, matchedQuery) {
         var url = '/data/volume/months/sentiment' + filters + matchedQuery.id + '&';
         
-        console.log('requesting sentiment data' + moment().format('HH-mm-ss-SSS'));
+        console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' +
+                    'Requesting sentiment data for queryId ' + matchedQuery.id);
         
         request.get(baseUrl + url + authKey,
             function (error, response, body) {
+                
+                console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 'Receiving sentiment');
+
                 var results = JSON.parse(body).results[0].values,
                     sentiments = {},
                     volume = 0;
@@ -97,9 +105,6 @@ var Brandwatch = {
 
                 sentiments.query = matchedQuery.name;
                 sentiments.volume = volume;
-
-                console.log('received sentiment data' + moment().format('HH-mm-ss-SSS'));
-
                 card.buildSentimentCard(apiclient, oAuth2Client, sentiments);
             }
         );
@@ -108,16 +113,18 @@ var Brandwatch = {
     getTopics: function(apiclient, oAuth2Client, matchedQuery) {
         var url = '/data/volume/topics/queries' + filters + matchedQuery.id + '&';
 
-        console.log('requesting topics data' + moment().format('HH-mm-ss-SSS'));
+        console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 
+                    'Requesting topics data for queryId ' + matchedQuery.id);
 
         request.get(baseUrl + url + authKey,
             function (error, response, body) {
+
+                console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 'Receiving topics');
+
                 var results = JSON.parse(body).topics,
                     sortedResults = _.sortBy(results, function(topic){
                         return topic.volume;
                     });
-
-                console.log('received topics data' + moment().format('HH-mm-ss-SSS'));
 
                 card.buildTopicsCard(apiclient, oAuth2Client, sortedResults);
             }

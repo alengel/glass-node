@@ -1,8 +1,10 @@
 'use strict';
 
+var moment = require('moment');
 var sentimentCard = require('./cards/sentimentCard.js');
 var topicsCard = require('./cards/topicsCard.js');
 var featureCard = require('./cards/featureCard.js');
+var TAG = 'card';
 
 function addCardToClient(apiclient, oAuth2Client, template) {
         //Insert the card into the timeline
@@ -12,6 +14,7 @@ function addCardToClient(apiclient, oAuth2Client, template) {
         .execute(function(err, data){
             console.log(err);
             console.log(data);
+            console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 'Cards displaying on Glass');
         });
 }
 
@@ -37,9 +40,6 @@ var Card = {
     },
 
     buildCoverCard: function(apiclient, oAuth2Client, query) {
-        // var queryForUrl = query.split(' ').join('_');
-        // console.log('http://'+ queryForUrl +'.jpg.to');
-
         var template = {
             'bundleId': 'brandwatch_' + query,
             'isBundleCover': true,
@@ -61,6 +61,8 @@ var Card = {
 
     //Build the HTML for the Sentiment card
     buildSentimentCard: function(apiclient, oAuth2Client, sentiments) {
+        console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 'Starting to build cards');
+
         var template = sentimentCard.buildTemplate(sentiments);
 
         //Build cover card of the bundle sent to Glass
@@ -72,6 +74,8 @@ var Card = {
 
     //Build the HTML for the Topics card
     buildTopicsCard: function(apiclient, oAuth2Client, topics) {
+        console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 'Starting to build cards');
+
         var template = topicsCard.buildTemplate(topics);
 
         //Push the card to Glass
@@ -79,6 +83,8 @@ var Card = {
     },
 
     buildFeatureCard: function(apiclient, oAuth2Client, features, query) {
+        console.log(moment().format('HH-mm-ss-SSS') + ' ' + TAG + ' Measurement ' + 'Starting to build cards');
+        
         var template = featureCard.buildTemplate(features, query);
 
         addCardToClient(apiclient, oAuth2Client, template);
