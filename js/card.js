@@ -27,7 +27,7 @@ var Card = {
                 'Item could not be identified. Please try again later.' +
                 '</section>' +
                 '<footer>' +
-                    '<p>Brandwatch Glassware</p>' +
+                    '<p>Brandwatch</p>' +
                 '</footer>' +
                 '</article>',
             'menuItems': [
@@ -51,7 +51,7 @@ var Card = {
                 '<p class="text-auto-size">'+ query +'</p>' +
                 '</section>' +
                 '<footer>' +
-                    '<p>Brandwatch Glassware</p>' +
+                    '<p>Brandwatch</p>' +
                 '</footer>' +
                 '</article>'
         };
