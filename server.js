@@ -11,11 +11,18 @@ var credentials = require('./credentials.json');
 var brandwatch = require('./js/brandwatch.js');
 var semantics3 = require('./js/semantics3.js');
 
-//Google Oauth Credentials
-var clientId = credentials.clientId;
-var clientSecret = credentials.clientSecret;
-var redirectUrl = 'http://ec2-54-72-234-120.eu-west-1.compute.amazonaws.com:8080/oauth2callback';
-var oAuth2Client = new googleapis.OAuth2Client(clientId, clientSecret, redirectUrl);
+//Google Oauth Credentials for local development
+var localClientId = credentials.localClientId;
+var localClientSecret = credentials.localClientSecret;
+var localRedirectUrl = 'http://localhost:8080/oauth2callback';
+var oAuth2Client = new googleapis.OAuth2Client(localClientId, localClientSecret, localRedirectUrl);
+
+//Google Oauth Credentials for EC2 dev environment
+// var clientId = credentials.clientId;
+// var clientSecret = credentials.clientSecret;
+// var redirectUrl = 'http://ec2-54-72-234-120.eu-west-1.compute.amazonaws.com:8080/oauth2callback';
+// var oAuth2Client = new googleapis.OAuth2Client(clientId, clientSecret, redirectUrl);
+
 var apiclient = null;
 var client_tokens = [];
 
@@ -69,7 +76,7 @@ http.createServer(function(req, res) {
                     
                     brandwatch.getSearchQuery(apiclient, oAuth2Client, query);
                     semantics3.getQuery(apiclient, oAuth2Client, query);
-                    // brandwatch.createQuery(apiclient, oAuth2Client, result.query);
+                    // brandwatch.createQuery(apiclient, oAuth2Client, query);
 
                     res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
                     res.end();
